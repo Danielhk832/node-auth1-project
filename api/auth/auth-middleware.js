@@ -23,9 +23,9 @@ async function checkUsernameFree(req, res, next) {
   try {
     const { username } = req.body;
     const [user] = await User.findBy({ username });
-    console.log(user);
+
     if (user) {
-      next({ status: 422, message: "username taken" });
+      next({ status: 422, message: "Username taken" });
     } else {
       next();
     }
@@ -69,16 +69,19 @@ async function checkUsernameExists(req, res, next) {
     "message": "Password must be longer than 3 chars"
   }
 */
-async function checkPasswordLength(req, res, next) {
+function checkPasswordLength(req, res, next) {
   try {
     const { password } = req.body;
-    if (password.length < 3) {
-      return next({
+    const stringPw = parseInt(password);
+    console.log(password.length);
+    if (stringPw.length < 3 || !password) {
+      next({
         status: 422,
         message: "Password must be longer than 3 chars",
       });
+    } else {
+      next();
     }
-    next();
   } catch (error) {
     next(error);
   }

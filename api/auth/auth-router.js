@@ -34,8 +34,8 @@ const {
 
 router.post(
   "/register",
-  checkUsernameFree,
   checkPasswordLength,
+  checkUsernameFree,
   async (req, res, next) => {
     try {
       const { username, password } = req.body;
