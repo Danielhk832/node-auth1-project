@@ -29,7 +29,7 @@ server.use(
     name: "NotACookie",
     secret: process.env.SESSION_SECRET || "keep it secret",
     cookie: {
-      maxAge: 1000 * 2080,
+      maxAge: 1000 * 3600,
       secure: false,
       httpOnly: true,
     },

@@ -3,23 +3,26 @@
 const router = require("express").Router();
 const bcrypt = require("bcryptjs");
 const User = require("../users/users-model");
+const { checkUsernameExists } = require("./auth-middleware");
 
 router.post("/register", async (req, res, next) => {
   try {
     const { username, password } = req.body;
-    const newUser = { username, password };
-    const result = await User.add(newUser);
+    const hash = bcrypt.hashSync(password, 6);
+    const newUser = { username, password: hash };
+    const user = await User.add(newUser);
+    res.status(201).json(user);
   } catch (error) {
     next(error);
   }
 });
 
-router.post("/login", async (req, res, next) => {
-  res.status().json();
+router.post("/login", checkUsernameExists, (req, res, next) => {
+  res.json({ message: `welcome ${req.session.user.username}` });
 });
 
 router.get("/logout", async (req, res, next) => {
-  res.status().json();
+  // res.status().json();
 });
 
 /**
