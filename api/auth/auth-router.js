@@ -36,13 +36,14 @@ router.post(
   "/register",
   checkPasswordLength,
   checkUsernameFree,
+
   async (req, res, next) => {
     try {
       const { username, password } = req.body;
       const hash = bcrypt.hashSync(password, 6);
       const newUser = { username, password: hash };
       const user = await User.add(newUser);
-      res.status(201).json(user);
+      res.status(200).json(user);
     } catch (error) {
       next(error);
     }
