@@ -3,27 +3,11 @@
 const router = require("express").Router();
 const bcrypt = require("bcryptjs");
 const User = require("../users/users-model");
-const { checkUsernameExists } = require("./auth-middleware");
-
-router.post("/register", async (req, res, next) => {
-  try {
-    const { username, password } = req.body;
-    const hash = bcrypt.hashSync(password, 6);
-    const newUser = { username, password: hash };
-    const user = await User.add(newUser);
-    res.status(201).json(user);
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.post("/login", checkUsernameExists, (req, res, next) => {
-  res.json({ message: `welcome ${req.session.user.username}` });
-});
-
-router.get("/logout", async (req, res, next) => {
-  // res.status().json();
-});
+const {
+  checkUsernameExists,
+  checkUsernameFree,
+  checkPasswordLength,
+} = require("./auth-middleware");
 
 /**
   1 [POST] /api/auth/register { "username": "sue", "password": "1234" }
@@ -48,6 +32,23 @@ router.get("/logout", async (req, res, next) => {
   }
  */
 
+router.post(
+  "/register",
+  checkUsernameFree,
+  checkPasswordLength,
+  async (req, res, next) => {
+    try {
+      const { username, password } = req.body;
+      const hash = bcrypt.hashSync(password, 6);
+      const newUser = { username, password: hash };
+      const user = await User.add(newUser);
+      res.status(201).json(user);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 /**
   2 [POST] /api/auth/login { "username": "sue", "password": "1234" }
 
@@ -64,6 +65,10 @@ router.get("/logout", async (req, res, next) => {
   }
  */
 
+router.post("/login", checkUsernameExists, (req, res, next) => {
+  res.json({ message: `welcome ${req.session.user.username}` });
+});
+
 /**
   3 [GET] /api/auth/logout
 
@@ -79,6 +84,10 @@ router.get("/logout", async (req, res, next) => {
     "message": "no session"
   }
  */
+
+router.get("/logout", async (req, res, next) => {
+  // res.status().json();
+});
 
 // Don't forget to add the router to the `exports` object so it can be required in other modules
 

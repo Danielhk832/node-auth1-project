@@ -19,7 +19,20 @@ function restricted() {}
     "message": "Username taken"
   }
 */
-async function checkUsernameFree(req, res, next) {}
+async function checkUsernameFree(req, res, next) {
+  try {
+    const { username } = req.body;
+    const [user] = await User.findBy({ username });
+    console.log(user);
+    if (user) {
+      next({ status: 422, message: "username taken" });
+    } else {
+      next();
+    }
+  } catch (error) {
+    next(error);
+  }
+}
 
 /*
   If the username in req.body does NOT exist in the database
@@ -56,7 +69,20 @@ async function checkUsernameExists(req, res, next) {
     "message": "Password must be longer than 3 chars"
   }
 */
-function checkPasswordLength() {}
+async function checkPasswordLength(req, res, next) {
+  try {
+    const { password } = req.body;
+    if (password.length < 3) {
+      return next({
+        status: 422,
+        message: "Password must be longer than 3 chars",
+      });
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
 
 // Don't forget to add these to the `exports` object so they can be required in other modules
 
